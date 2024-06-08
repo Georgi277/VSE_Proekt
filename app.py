@@ -59,3 +59,54 @@ def delete_post(post_id):
         posts.remove(post)
         return '', 204
     return jsonify({"error": "Post not found"}), 404
+
+@app.route('/posts/<int:post_id>/comments', methods=['GET'])
+def get_comments(post_id):
+    post_comments = [c for c in comments if c['post_id'] == post_id]
+    if post_comments:
+        return jsonify(post_comments), 200
+    return jsonify({"error": "Comments not found"}), 404
+
+@app.route('/posts/<int:post_id>/comments', methods=['POST'])
+def create_comment(post_id):
+    new_comment = request.get_json()
+    new_comment['post_id'] = post_id
+    new_comment['id'] = len(comments) + 1
+    comments.append(new_comment)
+    return jsonify(new_comment), 201
+
+@app.route('/posts/<int:post_id>/comments/<int:comment_id>', methods=['GET'])
+def get_comment(post_id, comment_id):
+    comment = next((c for c in comments if c['post_id'] == post_id and c['id'] == comment_id), None)
+    if comment:
+        return jsonify(comment), 200
+    return jsonify({"error": "Comment not found"}), 404
+
+@app.route('/posts/<int:post_id>/comments/<int:comment_id>', methods=['PUT'])
+def update_comment(post_id, comment_id):
+    updated_comment = request.get_json()
+    comment = next((c for c in comments if c['post_id'] == post_id and c['id'] == comment_id), None)
+    if comment:
+        comment.update(updated_comment)
+        return jsonify(comment), 200
+    return jsonify({"error": "Comment not found"}), 404
+
+@app.route('/posts/<int:post_id>/comments/<int:comment_id>', methods=['PATCH'])
+def partial_update_comment(post_id, comment_id):
+    updated_fields = request.get_json()
+    comment = next((c for c in comments if c['post_id'] == post_id and c['id'] == comment_id), None)
+    if comment:
+        comment.update(updated_fields)
+        return jsonify(comment), 200
+    return jsonify({"error": "Comment not found"}), 404
+
+@app.route('/posts/<int:post_id>/comments/<int:comment_id>', methods=['DELETE'])
+def delete_comment(post_id, comment_id):
+    comment = next((c for c in comments if c['post_id'] == post_id and c['id'] == comment_id), None)
+    if comment:
+        comments.remove(comment)
+        return '', 204
+    return jsonify({"error": "Comment not found"}), 404
+
+if __name__ == '__main__':
+    app.run(debug=True)
