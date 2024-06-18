@@ -1,23 +1,16 @@
 from flask import Flask, request, jsonify, render_template
-from flask import Flask, request, jsonify, render_template, redirect, url_for, flash
-from flask_sqlalchemy import SQLAlchemy
-from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
-from werkzeug.security import generate_password_hash, check_password_hash
-import hmac
-import os
-import json
 
-DATA_FILE = 'data.json'
 app = Flask(__name__)
 
-def read_json_file():
-    if not os.path.exists(DATA_FILE):
-        # Initialize the file with empty lists if it doesn't exist
-        data = {"posts": [], "comments": []}
-        write_json_file(data)   
-        return data
-    with open(DATA_FILE, 'r') as file:
-        return json.load(file)
+posts = [
+    {"id": 1, "title": "First Post", "content": "This is the first post."},
+    {"id": 2, "title": "Second Post", "content": "This is the second post."}
+]
+comments = [
+    {"post_id": 1, "id": 1, "content": "First comment on first post"},
+    {"post_id": 1, "id": 2, "content": "Second comment on first post"},
+    {"post_id": 2, "id": 1, "content": "First comment on second post"}
+]
 
 @app.route('/')
 def index():
@@ -25,9 +18,7 @@ def index():
 
 @app.route('/posts', methods=['GET'])
 def get_posts():
-    data = read_json_file()
-    return jsonify(data['posts']), 200
-
+    return jsonify(posts), 200
 
 @app.route('/posts', methods=['POST'])
 def create_post():
@@ -38,8 +29,6 @@ def create_post():
 
 @app.route('/posts/<int:post_id>', methods=['GET'])
 def get_post(post_id):
-    data = read_json_file(data.json)
-    posts = data['posts']
     post = next((p for p in posts if p['id'] == post_id), None)
     if post:
         return jsonify(post), 200
@@ -73,8 +62,6 @@ def delete_post(post_id):
 
 @app.route('/posts/<int:post_id>/comments', methods=['GET'])
 def get_comments(post_id):
-    data = read_json_file(data.json)
-    comments = data['comments']
     post_comments = [c for c in comments if c['post_id'] == post_id]
     if post_comments:
         return jsonify(post_comments), 200
@@ -90,8 +77,6 @@ def create_comment(post_id):
 
 @app.route('/posts/<int:post_id>/comments/<int:comment_id>', methods=['GET'])
 def get_comment(post_id, comment_id):
-    data = read_json_file(DATA_FILE)
-    comments = data['comments']
     comment = next((c for c in comments if c['post_id'] == post_id and c['id'] == comment_id), None)
     if comment:
         return jsonify(comment), 200
