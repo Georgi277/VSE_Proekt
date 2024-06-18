@@ -1,14 +1,14 @@
 document.addEventListener('DOMContentLoaded', function () {
     const postsDiv = document.getElementById('posts');
     const postForm = document.getElementById('post-form');
-    let posts = []; // Добавяме променлива за съхранение на постовете
+    let posts = []; 
 
     function loadPosts() {
         fetch('/posts')
             .then(response => response.json())
             .then(data => {
-                posts = data; // Запазваме постовете в променливата
-                renderPosts(posts); // Извикваме функцията за рендиране на постовете
+                posts = data; 
+                renderPosts(posts); 
             });
     }
 
@@ -97,11 +97,8 @@ document.addEventListener('DOMContentLoaded', function () {
                         }
                     })
                     .then(updatedPost => {
-                        // Намиране на индекса на редактирания пост в масива
                         const index = posts.findIndex(p => p.id === updatedPost.id);
-                        // Заместване на стария пост с новия в масива
                         posts[index] = updatedPost;
-                        // Рендиране на постовете отново
                         renderPosts(posts);
                     })
                     .catch(error => {
@@ -122,9 +119,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 })
                 .then(response => {
                     if (response.ok) {
-                        // Филтриране на масива от постове, за да премахнем изтрития пост
                         posts = posts.filter(p => p.id !== parseInt(postId));
-                        // Рендиране на постовете отново
                         renderPosts(posts);
                     } else {
                         throw new Error('Failed to delete post.');

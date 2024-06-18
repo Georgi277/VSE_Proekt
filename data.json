@@ -1,0 +1,41 @@
+{
+    "posts": [
+        {
+            "id": 1,
+            "title": "First Post",
+            "content": "This is the first post."
+        },
+        {
+            "id": 2,
+            "title": "Second Post",
+            "content": "This is the second post."
+        },
+        {
+            "title": "3",
+            "content": "3",
+            "id": 3
+        }
+    ],
+    "comments": [
+        {
+            "post_id": 1,
+            "id": 1,
+            "content": "First comment on first post"
+        },
+        {
+            "post_id": 1,
+            "id": 2,
+            "content": "Second comment on first post"
+        },
+        {
+            "post_id": 2,
+            "id": 1,
+            "content": "First comment on second post"
+        },
+        {
+            "content": "zdr",
+            "post_id": 1,
+            "id": 4
+        }
+    ]
+}
