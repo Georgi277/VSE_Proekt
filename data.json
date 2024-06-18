@@ -9,11 +9,6 @@
             "id": 2,
             "title": "Second Post",
             "content": "This is the second post."
-        },
-        {
-            "title": "3",
-            "content": "3",
-            "id": 3
         }
     ],
     "comments": [
@@ -31,11 +26,6 @@
             "post_id": 2,
             "id": 1,
             "content": "First comment on second post"
-        },
-        {
-            "content": "zdr",
-            "post_id": 1,
-            "id": 4
         }
     ]
 }

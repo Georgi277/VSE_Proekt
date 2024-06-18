@@ -7,8 +7,8 @@ document.addEventListener('DOMContentLoaded', function () {
         fetch('/posts')
             .then(response => response.json())
             .then(data => {
-                posts = data; 
-                renderPosts(posts); 
+                posts = data;
+                renderPosts(posts);
             });
     }
 
@@ -48,11 +48,20 @@ document.addEventListener('DOMContentLoaded', function () {
                 const commentList = document.getElementById(`comment-list-${postId}`);
                 commentList.innerHTML = '';
                 comments.forEach(comment => {
-                    const commentElement = document.createElement('p');
-                    commentElement.textContent = comment.content;
+                    const commentElement = createCommentElement(comment);
                     commentList.appendChild(commentElement);
                 });
             });
+    }
+
+    function createCommentElement(comment) {
+        const commentElement = document.createElement('div');
+        commentElement.innerHTML = `
+            <p>${comment.content}</p>
+            <button class="edit-comment" data-post-id="${comment.post_id}" data-comment-id="${comment.id}">Edit</button>
+            <button class="delete-comment" data-post-id="${comment.post_id}" data-comment-id="${comment.id}">Delete</button>
+        `;
+        return commentElement;
     }
 
     postForm.addEventListener('submit', function (e) {
@@ -107,11 +116,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     });
                 }
             }
-        }
-    });
-
-    postsDiv.addEventListener('click', function (e) {
-        if (e.target.classList.contains('delete-post')) {
+        } else if (e.target.classList.contains('delete-post')) {
             const postId = e.target.dataset.postId;
             if (confirm('Are you sure you want to delete this post?')) {
                 fetch(`/posts/${postId}`, {
@@ -151,6 +156,58 @@ document.addEventListener('DOMContentLoaded', function () {
                 loadComments(postId);
                 e.target.reset();
             });
+        }
+    });
+
+    postsDiv.addEventListener('click', function (e) {
+        if (e.target.classList.contains('edit-comment')) {
+            const postId = e.target.dataset.postId;
+            const commentId = e.target.dataset.commentId;
+            const commentElement = e.target.parentElement;
+            const commentText = commentElement.querySelector('p').textContent;
+            const newContent = prompt('Enter new comment:', commentText);
+            if (newContent) {
+                fetch(`/posts/${postId}/comments/${commentId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ content: newContent })
+                })
+                .then(response => {
+                    if (response.ok) {
+                        return response.json();
+                    } else {
+                        throw new Error('Failed to update comment.');
+                    }
+                })
+                .then(updatedComment => {
+                    commentElement.querySelector('p').textContent = updatedComment.content;
+                })
+                .catch(error => {
+                    console.error('Error updating comment:', error);
+                    alert('Failed to update comment.');
+                });
+            }
+        } else if (e.target.classList.contains('delete-comment')) {
+            const postId = e.target.dataset.postId;
+            const commentId = e.target.dataset.commentId;
+            if (confirm('Are you sure you want to delete this comment?')) {
+                fetch(`/posts/${postId}/comments/${commentId}`, {
+                    method: 'DELETE'
+                })
+                .then(response => {
+                    if (response.ok) {
+                        loadComments(postId);
+                    } else {
+                        throw new Error('Failed to delete comment.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error deleting comment:', error);
+                    alert('Failed to delete comment.');
+                });
+            }
         }
     });
 
