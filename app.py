@@ -43,20 +43,13 @@ def update_post(post_id):
         return jsonify(post), 200
     return jsonify({"error": "Post not found"}), 404
 
-@app.route('/posts/<int:post_id>', methods=['PATCH'])
-def partial_update_post(post_id):
-    updated_fields = request.get_json()
-    post = next((p for p in posts if p['id'] == post_id), None)
-    if post:
-        post.update(updated_fields)
-        return jsonify(post), 200
-    return jsonify({"error": "Post not found"}), 404
-
 @app.route('/posts/<int:post_id>', methods=['DELETE'])
 def delete_post(post_id):
     post = next((p for p in posts if p['id'] == post_id), None)
     if post:
         posts.remove(post)
+        global comments
+        comments = [c for c in comments if c['post_id'] != post_id]
         return '', 204
     return jsonify({"error": "Post not found"}), 404
 
@@ -88,15 +81,6 @@ def update_comment(post_id, comment_id):
     comment = next((c for c in comments if c['post_id'] == post_id and c['id'] == comment_id), None)
     if comment:
         comment.update(updated_comment)
-        return jsonify(comment), 200
-    return jsonify({"error": "Comment not found"}), 404
-
-@app.route('/posts/<int:post_id>/comments/<int:comment_id>', methods=['PATCH'])
-def partial_update_comment(post_id, comment_id):
-    updated_fields = request.get_json()
-    comment = next((c for c in comments if c['post_id'] == post_id and c['id'] == comment_id), None)
-    if comment:
-        comment.update(updated_fields)
         return jsonify(comment), 200
     return jsonify({"error": "Comment not found"}), 404
 
